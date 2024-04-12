@@ -1,22 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import useGoogleAuth from "./Auth.js";
 
 function App() {
+  const { isLoggedIn, userProfile, isLoading, handleLogin, handleLogout } =
+    useGoogleAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <h1>ChronoScape productivity tracker</h1>
+        <p>A productivity tracker to help you manage your time and tasks.</p>
+        {isLoggedIn ? (
+          <button onClick={handleLogout}>Logout</button>
+        ) : (
+          <button onClick={handleLogin}>Login</button>
+        )}
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          {isLoggedIn ? (
+            <div>
+              <h2>Welcome {userProfile.getName()}</h2>
+            </div>
+          ) : (
+            <h2>Please login to continue</h2>
+          )}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
     </div>
   );
