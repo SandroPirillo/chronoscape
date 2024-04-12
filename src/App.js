@@ -1,6 +1,8 @@
 import React from "react";
 import useGoogleAuth from "./Auth.js";
-
+import "./App.css";
+import "./Components/Dashboard.js"
+import Dashboard from "./Components/Dashboard.js";
 function App() {
   const { isLoggedIn, userProfile, isLoading, handleLogin, handleLogout } =
     useGoogleAuth();
@@ -11,24 +13,23 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>ChronoScape productivity tracker</h1>
-        <p>A productivity tracker to help you manage your time and tasks.</p>
+      <h1>ChronoScape productivity tracker</h1>
+      <p>A productivity tracker to help you manage your time and tasks.</p>
+      {isLoggedIn ? (
+        <button className="login-button" onClick={handleLogout}>Logout</button>
+      ) : (
+        <button className="login-button" onClick={handleLogin}>Login</button>
+      )}
+      
         {isLoggedIn ? (
-          <button onClick={handleLogout}>Logout</button>
+          <div>
+            <h2>Welcome {userProfile.getName()}</h2>
+            <Dashboard />
+          </div>
         ) : (
-          <button onClick={handleLogin}>Login</button>
+          <h2>Please login to continue</h2>
         )}
-        <p>
-          {isLoggedIn ? (
-            <div>
-              <h2>Welcome {userProfile.getName()}</h2>
-            </div>
-          ) : (
-            <h2>Please login to continue</h2>
-          )}
-        </p>
-      </header>
+      
     </div>
   );
 }

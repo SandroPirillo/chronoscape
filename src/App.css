@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  color: rgb(14, 221, 169);
+
 }
 
 .App-logo {
@@ -35,4 +37,23 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.login-button {
+  font-size: larger;
+  padding: 10px 20px;
+  background-color: #008CBA; /* Blue color */
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition-duration: 0.4s; /* Transition effect duration */
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.login-button:hover {
+  background-color: #4CAF50; /* Green color on hover */
+  color: white;
 }

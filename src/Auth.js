@@ -1,5 +1,4 @@
 // auth.js
-
 import { useState, useEffect } from "react";
 
 const useGoogleAuth = () => {
