@@ -5,10 +5,9 @@ import Event from "../Models/Event";
 const Dashboard = () => {
   const [calendarData, setCalendarData] = useState([]);
 
-  useEffect(() => {
+  useEffect((startDate, endDate) => {
     // Fetch data from Google Calendar API
     const fetchData = async () => {
-      
       try {
         const currentDate = new Date();
         const firstDayOfLastMonth = new Date(
@@ -24,7 +23,7 @@ const Dashboard = () => {
           59,
           59
         );
-        
+
         const response = await window.gapi.client.calendar.events.list({
           calendarId: "primary",
           timeMin: firstDayOfLastMonth.toISOString(),
@@ -33,7 +32,8 @@ const Dashboard = () => {
           singleEvents: true,
           orderBy: "startTime",
         });
-        const events = response.result.items;
+        const CalendarEvents = response.result.items;
+        const events = convertDataToEventObjects(CalendarEvents);
         setCalendarData(events);
       } catch (error) {
         console.error("Error fetching calendar data:", error);
@@ -43,15 +43,24 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  // Convert calendar data to Event objects
+  const convertDataToEventObjects = (CalendarEvents) => {
+    const eventObjects = CalendarEvents.map((event) => {
+      const startTime = new Date(event.start.dateTime);
+      const endTime = new Date(event.end.dateTime);
+      const eventObject = new Event(event.summary, startTime, endTime);
+      return eventObject;
+    });
+    return eventObjects;
+  };
   // Calculate total time spent for each event with the same name
-
 
   const filterEventsByUniqueName = () => {
     const uniqueEventNames = [
-      ...new Set(calendarData.map((event) => event.summary)),
+      ...new Set(calendarData.map((event) => event.name)),
     ];
     const filteredArrays = uniqueEventNames.map((eventName) =>
-      calendarData.filter((event) => event.summary === eventName)
+      calendarData.filter((event) => event.name === eventName)
     );
     return filteredArrays;
   };
@@ -74,14 +83,14 @@ const Dashboard = () => {
   // Calculate total time spent and count for each event with the same name
   const calculateTotalTimeAndCount = (eventName) => {
     const eventsWithSameName = calendarData.filter(
-      (event) => event.summary === eventName
+      (event) => event.name === eventName
     );
     let totalTime = 0;
     let eventCount = eventsWithSameName.length;
 
     eventsWithSameName.forEach((event) => {
-      const startTime = new Date(event.start.dateTime);
-      const endTime = new Date(event.end.dateTime);
+      const startTime = new Date(event.startTime);
+      const endTime = new Date(event.endTime);
       const eventTime = endTime - startTime;
       totalTime += eventTime;
     });
@@ -89,7 +98,17 @@ const Dashboard = () => {
     return { totalTime, eventCount };
   };
 
+  // Calculate total time spent for each event in the array
+  const calculateTotalTime = (array) => {
+    let totalTime = 0;
+    
+    array.forEach((event) => {
+      console.log(event.name + " " + event.totalTime);
 
+      totalTime += event.totalTime;
+    });
+    return totalTime;
+  };
 
   // Remove elements from array1 that are present in array2
   const removeMatchingElements = (array1, array2) => {
@@ -99,6 +118,7 @@ const Dashboard = () => {
 
   const filteredArrays = filterEventsByUniqueName();
   const arraysWithOneElement = getArraysWithOneElement(filteredArrays);
+  const flatArray = arraysWithOneElement.flat();
 
   //add new element to array
   // Remove arrays with one element from filteredArrays
@@ -107,33 +127,30 @@ const Dashboard = () => {
     arraysWithOneElement
   );
 
+
+
   return (
     <div className="dashboard">
-      {
-        /* Render your calendar data */
-        console.log("array" + arraysWithOneElement)
-      }
 
       {filteredArraysNoSingleElement.map((filteredArray) => {
         const { totalTime, eventCount } = calculateTotalTimeAndCount(
-          filteredArray[0].summary
+          filteredArray[0].name
         );
 
         return (
           <div>
             <div key={filteredArray[0].id} className="event-card">
-              <h3>{filteredArray[0].summary}</h3>
+              <h3>{filteredArray[0].name}</h3>
               <p>Total time spent: {formatTime(totalTime)}</p>
               <p>Event count: {eventCount}</p>
             </div>
-
           </div>
         );
       })}
 
       <div className="event-card">
         <h3>Misc</h3>
-        <p>Total time spent: {}</p>
+        <p>Total time spent: {formatTime(calculateTotalTime(flatArray))}</p>
         <p>Event count: {arraysWithOneElement.length}</p>
       </div>
     </div>
@@ -141,8 +158,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
 
 /*
 
@@ -167,4 +182,3 @@ calculate total time for events
 
 
 */
-
