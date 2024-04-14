@@ -14,8 +14,9 @@
 }
 
 .event-card:hover{
-    background-color: #4d4a4a;
-    box-shadow:  #888888;
+    background-color: #8b8b8b;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
 }
 
 .dashboard{

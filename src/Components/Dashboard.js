@@ -5,29 +5,14 @@ import Event from "../Models/Event";
 const Dashboard = () => {
   const [calendarData, setCalendarData] = useState([]);
 
-  useEffect((startDate, endDate) => {
+  useEffect(() => {
     // Fetch data from Google Calendar API
-    const fetchData = async () => {
+    const fetchData = async (startDate, endDate) => {
       try {
-        const currentDate = new Date();
-        const firstDayOfLastMonth = new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth() - 1,
-          1
-        );
-        const lastDayOfLastMonth = new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          0,
-          23,
-          59,
-          59
-        );
-
         const response = await window.gapi.client.calendar.events.list({
           calendarId: "primary",
-          timeMin: firstDayOfLastMonth.toISOString(),
-          timeMax: lastDayOfLastMonth.toISOString(),
+          timeMin: startDate.toISOString(),
+          timeMax: endDate.toISOString(),
           showDeleted: false,
           singleEvents: true,
           orderBy: "startTime",
@@ -40,7 +25,22 @@ const Dashboard = () => {
       }
     };
 
-    fetchData();
+    const currentDate = new Date();
+    const firstDayOfLastMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - 1,
+      1
+    );
+    const lastDayOfLastMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      0,
+      23,
+      59,
+      59
+    );
+
+    fetchData(firstDayOfLastMonth, lastDayOfLastMonth);
   }, []);
 
   // Convert calendar data to Event objects
@@ -101,7 +101,7 @@ const Dashboard = () => {
   // Calculate total time spent for each event in the array
   const calculateTotalTime = (array) => {
     let totalTime = 0;
-    
+
     array.forEach((event) => {
       console.log(event.name + " " + event.totalTime);
 
@@ -127,31 +127,86 @@ const Dashboard = () => {
     arraysWithOneElement
   );
 
+  const handleFetchData = async (option) => {
+    const currentDate = new Date();
+    let startDate;
 
+    switch (option) {
+      case "1week":
+        startDate = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "1month":
+        startDate = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() - 1,
+          currentDate.getDate()
+        );
+        break;
+      case "6months":
+        startDate = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() - 6,
+          currentDate.getDate()
+        );
+        break;
+      case "1year":
+        startDate = new Date(
+          currentDate.getFullYear() - 1,
+          currentDate.getMonth(),
+          currentDate.getDate()
+        );
+        break;
+      default:
+        startDate = currentDate;
+        break;
+    }
+
+    try {
+      const response = await window.gapi.client.calendar.events.list({
+        calendarId: "primary",
+        timeMin: startDate.toISOString(),
+        timeMax: currentDate.toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        orderBy: "startTime",
+      });
+      const CalendarEvents = response.result.items;
+      const events = convertDataToEventObjects(CalendarEvents);
+      setCalendarData(events);
+    } catch (error) {
+      console.error("Error fetching calendar data:", error);
+    }
+    
+  };
 
   return (
-    <div className="dashboard">
+    <div>
+      <button className="" onClick={() => handleFetchData("1week")}>1 Week</button>
+      <button className="" onClick={() => handleFetchData("1month")}>1 Month</button>
+      <button className="" onClick={() => handleFetchData("6months")}>6 Months</button>
+      <button className="" onClick={() => handleFetchData("1year")}>1 Year</button>
+      <div className="dashboard">
+        {filteredArraysNoSingleElement.map((filteredArray) => {
+          const { totalTime, eventCount } = calculateTotalTimeAndCount(
+            filteredArray[0].name
+          );
 
-      {filteredArraysNoSingleElement.map((filteredArray) => {
-        const { totalTime, eventCount } = calculateTotalTimeAndCount(
-          filteredArray[0].name
-        );
-
-        return (
-          <div>
-            <div key={filteredArray[0].id} className="event-card">
-              <h3>{filteredArray[0].name}</h3>
-              <p>Total time spent: {formatTime(totalTime)}</p>
-              <p>Event count: {eventCount}</p>
+          return (
+            <div>
+              <div key={filteredArray[0].id} className="event-card">
+                <h3>{filteredArray[0].name}</h3>
+                <p>Total time spent: {formatTime(totalTime)}</p>
+                <p>Event count: {eventCount}</p>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
 
-      <div className="event-card">
-        <h3>Misc</h3>
-        <p>Total time spent: {formatTime(calculateTotalTime(flatArray))}</p>
-        <p>Event count: {arraysWithOneElement.length}</p>
+        <div className="event-card">
+          <h3>Misc</h3>
+          <p>Total time spent: {formatTime(calculateTotalTime(flatArray))}</p>
+          <p>Event count: {arraysWithOneElement.length}</p>
+        </div>
       </div>
     </div>
   );
