@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./Dashboard.css";
+import Event from "../Models/Event";
+
 const Dashboard = () => {
   const [calendarData, setCalendarData] = useState([]);
 
   useEffect(() => {
     // Fetch data from Google Calendar API
     const fetchData = async () => {
+      
       try {
         const currentDate = new Date();
         const firstDayOfLastMonth = new Date(
@@ -21,8 +24,8 @@ const Dashboard = () => {
           59,
           59
         );
-
-        const response = await gapi.client.calendar.events.list({
+        
+        const response = await window.gapi.client.calendar.events.list({
           calendarId: "primary",
           timeMin: firstDayOfLastMonth.toISOString(),
           timeMax: lastDayOfLastMonth.toISOString(),
@@ -41,21 +44,7 @@ const Dashboard = () => {
   }, []);
 
   // Calculate total time spent for each event with the same name
-  const calculateTotalTime = (eventName) => {
-    const eventsWithSameName = calendarData.filter(
-      (event) => event.summary === eventName
-    );
-    let totalTime = 0;
 
-    eventsWithSameName.forEach((event) => {
-      const startTime = new Date(event.start.dateTime);
-      const endTime = new Date(event.end.dateTime);
-      const eventTime = endTime - startTime;
-      totalTime += eventTime;
-    });
-
-    return totalTime;
-  };
 
   const filterEventsByUniqueName = () => {
     const uniqueEventNames = [
@@ -100,6 +89,8 @@ const Dashboard = () => {
     return { totalTime, eventCount };
   };
 
+
+
   // Remove elements from array1 that are present in array2
   const removeMatchingElements = (array1, array2) => {
     const newArray = array1.filter((element) => !array2.includes(element));
@@ -108,20 +99,20 @@ const Dashboard = () => {
 
   const filteredArrays = filterEventsByUniqueName();
   const arraysWithOneElement = getArraysWithOneElement(filteredArrays);
-  //add new element to array
-  
-  console.log(arraysWithOneElement);
 
+  //add new element to array
   // Remove arrays with one element from filteredArrays
   const filteredArraysNoSingleElement = removeMatchingElements(
     filteredArrays,
     arraysWithOneElement
   );
 
-
   return (
     <div className="dashboard">
-      {/* Render your calendar data */}
+      {
+        /* Render your calendar data */
+        console.log("array" + arraysWithOneElement)
+      }
 
       {filteredArraysNoSingleElement.map((filteredArray) => {
         const { totalTime, eventCount } = calculateTotalTimeAndCount(
@@ -129,15 +120,51 @@ const Dashboard = () => {
         );
 
         return (
-          <div key={filteredArray[0].id} className="event-card">
-            <h3>{filteredArray[0].summary}</h3>
-            <p>Total time spent: {formatTime(totalTime)}</p>
-            <p>Event count: {eventCount}</p>
+          <div>
+            <div key={filteredArray[0].id} className="event-card">
+              <h3>{filteredArray[0].summary}</h3>
+              <p>Total time spent: {formatTime(totalTime)}</p>
+              <p>Event count: {eventCount}</p>
+            </div>
+
           </div>
         );
       })}
+
+      <div className="event-card">
+        <h3>Misc</h3>
+        <p>Total time spent: {}</p>
+        <p>Event count: {arraysWithOneElement.length}</p>
+      </div>
     </div>
   );
 };
 
 export default Dashboard;
+
+
+
+/*
+
+event object
+event = {
+  name
+  start
+  end
+  total time
+}
+
+functions:
+fetch this months data
+fetch last months data
+fetch this weeks data
+fetch last weeks data
+fetch todays data
+fetch yesterdays data
+convert data to event objects
+group events by name
+calculate total time for events
+
+
+*/
+

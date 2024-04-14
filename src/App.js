@@ -1,5 +1,5 @@
 import React from "react";
-import useGoogleAuth from "./Auth.js";
+import useGoogleAuth from "./CalendarAccess.js";
 import "./App.css";
 import "./Components/Dashboard.js";
 import Dashboard from "./Components/Dashboard.js";
@@ -10,6 +10,8 @@ function App() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  
 
   return (
     <div className="App">
