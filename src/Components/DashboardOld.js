@@ -53,8 +53,8 @@ const Dashboard = () => {
     });
     return eventObjects;
   };
+  
   // Calculate total time spent for each event with the same name
-
   const filterEventsByUniqueName = () => {
     const uniqueEventNames = [
       ...new Set(calendarData.map((event) => event.name)),

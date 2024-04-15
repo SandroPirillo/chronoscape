@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./Dashboard.css";
 import Event from "../Models/Event";
 
 const Dashboard = () => {
   const [calendarDataCurrent, setCalendarDataCurrent] = useState([]);
   const [calendarDataPrevious, setCalendarDataPrevious] = useState([]);
-
-  useEffect(() => {
-    fetchData("week");
-  }, []);
-
-  const fetchData = async (timeSpan) => {
-    var {
-      endDateCurrent,
-      startDateCurrent,
-      endDatePrevious,
-      startDatePrevious,
-    } = dateSetter(timeSpan);
-    setCalendarDataCurrent(await makeRequest(startDateCurrent, endDateCurrent));
-    setCalendarDataPrevious(await makeRequest(startDatePrevious, endDatePrevious));
-  };
+  const [Datebounds, setDatebounds] = useState([]);
 
   async function makeRequest(startDate, endDate) {
     try {
@@ -33,8 +19,6 @@ const Dashboard = () => {
       });
       const CalendarEvents = response.result.items;
       const calendarData = convertDataToEventObjects(CalendarEvents);
-      console.log("startDate", startDate.toISOString());
-      console.log("endDate", endDate.toISOString());
       return calendarData;
     } catch (error) {
       console.error("Error fetching calendar data:", error);
@@ -47,7 +31,7 @@ const Dashboard = () => {
       const startTime = new Date(event.start.dateTime);
       const endTime = new Date(event.end.dateTime);
       const colour = event.colorId;
-      const eventObject = new Event(event.summary, startTime, endTime);
+      const eventObject = new Event(event.summary, startTime, endTime, colour);
       return eventObject;
     });
     return eventObjects;
@@ -85,6 +69,27 @@ const Dashboard = () => {
     };
   }
 
+  const fetchData = useCallback(async (timeSpan) => {
+    var dates = dateSetter(timeSpan);
+    setDatebounds([
+      dates.endDateCurrent,
+      dates.startDateCurrent,
+      dates.endDatePrevious,
+      dates.startDatePrevious,
+    ]);
+
+    setCalendarDataCurrent(
+      await makeRequest(dates.startDateCurrent, dates.endDateCurrent)
+    );
+    setCalendarDataPrevious(
+      await makeRequest(dates.startDatePrevious, dates.endDatePrevious)
+    );
+  }, []);
+
+  useEffect(() => {
+    fetchData("week");
+  }, [fetchData]);
+
   const formatTime = (timeInMilliseconds) => {
     const seconds = Math.floor((timeInMilliseconds / 1000) % 60);
     const minutes = Math.floor((timeInMilliseconds / (1000 * 60)) % 60);
@@ -119,47 +124,93 @@ const Dashboard = () => {
     return totalTime;
   };
 
-return (
-    <div>
-        <div>
-            <button onClick={() => fetchData("week")}>Fetch Week Data</button>
-            <button onClick={() => fetchData("month")}>Fetch Month Data</button>
+  function groupEventsByName(events) {
+    // Create an object where the keys are event names and the values are arrays of events
+    const eventsByName = events.reduce((obj, event) => {
+      if (!obj[event.name]) {
+        obj[event.name] = [];
+      }
+      obj[event.name].push(event);
+      return obj;
+    }, {});
 
-            <p>
-                Current Start Date: {calendarDataCurrent.length > 0 ? calendarDataCurrent[0].startTime.toLocaleDateString() : " "} 
-                Current End Date: {calendarDataCurrent.length > 0 ? calendarDataCurrent[calendarDataCurrent.length - 1].startTime.toLocaleDateString() : " "}
-            </p>
-            <p>
-            Previous Start Date: {calendarDataPrevious.length > 0 ? calendarDataPrevious[0].startTime.toLocaleDateString() : " "} 
-            Previous End Date: {calendarDataPrevious.length > 0 ? calendarDataPrevious[calendarDataPrevious.length - 1].startTime.toLocaleDateString() : " "}
-            </p>
+    // Create a "Miscellaneous" group for events with unique names
+    const miscellaneous = [];
+    for (const [name, events] of Object.entries(eventsByName)) {
+      if (events.length === 1) {
+        miscellaneous.push(events[0]);
+        delete eventsByName[name];
+      }
+    }
+    if (miscellaneous.length > 0) {
+      eventsByName["Miscellaneous"] = miscellaneous;
+    }
+
+    // Convert the object to an array of arrays
+    const groupedEvents = Object.entries(eventsByName).map(
+      ([name, events]) => ({ name, events })
+    );
+
+    return groupedEvents;
+  }
+
+  function groupEventsByColor(events) {
+    // Create an object where the keys are event colors and the values are arrays of events
+    const eventsByColor = events.reduce((obj, event) => {
+      if (!obj[event.color]) {
+        obj[event.color] = [];
+      }
+      obj[event.color].push(event);
+      return obj;
+    }, {});
+
+    // Convert the object to an array of arrays
+    const groupedEvents = Object.values(eventsByColor);
+
+    return groupedEvents;
+  }
+
+  //i want to console log all the events in the calendarDataCurrent
+  console.log(calendarDataCurrent);
+  const groupedEvents = groupEventsByName(calendarDataCurrent);
+  console.log(groupedEvents);
+  return (
+    <div>
+      <div>
+        <button onClick={() => fetchData("week")}>Fetch Week Data</button>
+        <button onClick={() => fetchData("month")}>Fetch Month Data</button>
+
+        <p>
+          Current Start:{" "}
+          {Datebounds[1] ? Datebounds[1].toLocaleDateString() : ""} Current End:{" "}
+          {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
+        </p>
+        <p>
+          Previous Start:{" "}
+          {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous
+          End: {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
+        </p>
+        <div className="dashboard">
+          {groupedEvents.map((group) => (
+            <div className="event-card" key={group.name}>
+              <h3>{group.name}</h3>
+              <p>Total Events: {group.events.length}</p>
+              <p>Total Time: {formatTime(calculateTotalTime(group.events))}</p>
+            </div>
+          ))}
         </div>
+      </div>
     </div>
-);
+  );
 };
 
 export default Dashboard;
 
 /*
 
-event object
-event = {
-  name
-  start
-  end
-  total time
-}
-
 functions:
-fetch this months data
-fetch last months data
-fetch this weeks data
-fetch last weeks data
 fetch todays data
 fetch yesterdays data
-convert data to event objects
-group events by name
-calculate total time for events
 
 
 */
