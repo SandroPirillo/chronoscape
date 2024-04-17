@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import "./Dashboard.css";
 import EventGroupingAndComparisionHelper from "../Utils/EventGroupingAndComparisionHelper.js";
 import EventList from "./EventList";
+import EventGroupDisplayCard from "./EventGroupDisplayCard";
 
 const Dashboard = () => {
   const [calendarDataCurrent, setCalendarDataCurrent] = useState([]);
@@ -11,6 +12,7 @@ const Dashboard = () => {
 
 
   const handleGroupClick = group => {
+    console.log("Group clicked", group);
     setSelectedGroup(group);
   };
 
@@ -92,39 +94,12 @@ const Dashboard = () => {
         <div className="dashboard">
           {groupedEventsCurrent.map((groupCurrent) => {
             return (
-              <div className="event-card" key={groupCurrent.name} onClick={() => handleGroupClick(groupCurrent)}>
-                <h3>{groupCurrent.name}</h3>
-                <p>Total Events: {groupCurrent.events.length}</p>
-                <p>
-                  Total Time:{" "}
-                  {EventGroupingAndComparisionHelper.formatTime(EventGroupingAndComparisionHelper.calculateTotalTime(groupCurrent.events))}
-                </p>
-                {comparisonResult.map((result) => {
-                  if (result.name === groupCurrent.name) {
-                    return (
-                      <div>
-                        <p
-                          className={
-                            result.eventsDifference < 0
-                              ? "negative"
-                              : "positive"
-                          }
-                        >
-                          Events Difference: {result.eventsDifference}
-                        </p>
-                        <p
-                          className={
-                            EventGroupingAndComparisionHelper.formatTime(result.timeDifference).startsWith("-")
-                              ? "negative"
-                              : "positive"
-                          }
-                        >
-                          Time Difference: {EventGroupingAndComparisionHelper.formatTime(result.timeDifference)}
-                        </p>
-                      </div>
-                    );
-                  }
-                })}
+              <div onClick={() => handleGroupClick(groupCurrent)}>
+              <EventGroupDisplayCard
+                key={groupCurrent.name}
+                groupCurrent={groupCurrent}
+                comparisonResult={comparisonResult}
+              />
               </div>
             );
           })}

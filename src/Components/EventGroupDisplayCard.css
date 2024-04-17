@@ -1,12 +1,3 @@
-.dashboard{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    margin: 10px;
-}
-
 .positive{
     color: rgb(8, 184, 37);
 }
