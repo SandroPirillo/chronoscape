@@ -3,6 +3,7 @@ import "./Dashboard.css";
 import EventGroupingAndComparisionHelper from "../Utils/EventGroupingAndComparisionHelper.js";
 import EventList from "./EventList";
 import EventGroupDisplayCard from "./EventGroupDisplayCard";
+import EventGroupChartDisplay from "./EventGroupChartDisplay.js";
 
 const Dashboard = () => {
   const [calendarDataCurrent, setCalendarDataCurrent] = useState([]);
@@ -68,6 +69,8 @@ const Dashboard = () => {
     groupedEventsCurrent,
     groupedEventsPrevious
   );
+  console.log(groupedEventsCurrent);
+  console.log(groupedEventsPrevious);
 
   if (selectedGroup) {
     return <EventList group={selectedGroup} onBack={() => setSelectedGroup(null)} dates={[Datebounds[1].toLocaleDateString(), Datebounds[0].toLocaleDateString()]}/>;
@@ -102,7 +105,9 @@ const Dashboard = () => {
               </div>
             );
           })}
+
         </div>
+        <EventGroupChartDisplay groups={[groupedEventsCurrent, groupedEventsPrevious]}  />
       </div>
     </div>
   );
