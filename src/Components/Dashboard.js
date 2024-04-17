@@ -39,27 +39,36 @@ const Dashboard = () => {
 
   function dateSetter(timeSpan) {
     var endDateCurrent = new Date();
-    var startDateCurrent = new Date(endDateCurrent);
-    var endDatePrevious = new Date();
-    var startDatePrevious = new Date();
-
+    var startDateCurrent = new Date();
+    var endDatePrevious = new Date(startDateCurrent.getTime());
+    var startDatePrevious = new Date(startDateCurrent.getTime());
+  
     switch (timeSpan) {
+      case "day":
+        startDateCurrent.setTime(startDateCurrent.getTime());
+        endDatePrevious.setTime(startDateCurrent.getTime() - 24*60*60*1000);
+        startDatePrevious.setTime(endDatePrevious.getTime());
+        break;
       case "week":
-        startDateCurrent.setDate(endDateCurrent.getDate() - 7);
-        endDatePrevious.setDate(startDateCurrent.getDate() - 1);
-        startDatePrevious.setDate(endDatePrevious.getDate() - 7);
+        startDateCurrent.setTime(endDateCurrent.getTime() - 6*24*60*60*1000);
+        endDatePrevious.setTime(startDateCurrent.getTime() - 24*60*60*1000);
+        startDatePrevious.setTime(endDatePrevious.getTime() - 6*24*60*60*1000);
         break;
       case "month":
-        startDateCurrent.setDate(endDateCurrent.getDate() - 30);
-        endDatePrevious.setDate(startDateCurrent.getDate() - 1);
-        startDatePrevious.setDate(endDatePrevious.getDate() - 30);
+        startDateCurrent.setTime(startDateCurrent.getTime() - 27*24*60*60*1000);
+        endDatePrevious.setTime(startDateCurrent.getTime() - 24*60*60*1000);
+        startDatePrevious.setTime(endDatePrevious.getTime() - 27*24*60*60*1000);
         break;
       default:
-        startDateCurrent.setDate(endDateCurrent.getDate() - 7);
-        endDatePrevious.setDate(startDateCurrent.getDate() - 1);
-        startDatePrevious.setDate(endDatePrevious.getDate() - 7);
+        startDateCurrent.setTime(startDateCurrent.getTime() - 6*24*60*60*1000);
+        endDatePrevious.setTime(startDateCurrent.getTime() - 24*60*60*1000);
+        startDatePrevious.setTime(endDatePrevious.getTime() - 6*24*60*60*1000);
         break;
     }
+    endDateCurrent.setHours(23, 59, 59, 999);
+    startDateCurrent.setHours(0, 0, 0, 0);
+    endDatePrevious.setHours(23, 59, 59, 999);
+    startDatePrevious.setHours(0, 0, 0, 0);
 
     return {
       endDateCurrent,
@@ -78,12 +87,17 @@ const Dashboard = () => {
       dates.startDatePrevious,
     ]);
 
-    setCalendarDataCurrent(
-      await makeRequest(dates.startDateCurrent, dates.endDateCurrent)
+    const currentData = await makeRequest(
+      dates.startDateCurrent,
+      dates.endDateCurrent
     );
-    setCalendarDataPrevious(
-      await makeRequest(dates.startDatePrevious, dates.endDatePrevious)
+    const previousData = await makeRequest(
+      dates.startDatePrevious,
+      dates.endDatePrevious
     );
+
+    setCalendarDataCurrent(currentData);
+    setCalendarDataPrevious(previousData);
   }, []);
 
   useEffect(() => {
@@ -91,6 +105,12 @@ const Dashboard = () => {
   }, [fetchData]);
 
   const formatTime = (timeInMilliseconds) => {
+    let isNegative = false;
+    if (timeInMilliseconds < 0) {
+      isNegative = true;
+      timeInMilliseconds = Math.abs(timeInMilliseconds);
+    }
+
     const seconds = Math.floor((timeInMilliseconds / 1000) % 60);
     const minutes = Math.floor((timeInMilliseconds / (1000 * 60)) % 60);
     const hours = Math.floor((timeInMilliseconds / (1000 * 60 * 60)) % 24);
@@ -109,6 +129,10 @@ const Dashboard = () => {
     }
     if (seconds > 0) {
       formattedTime += `${seconds}s`;
+    }
+
+    if (isNegative) {
+      formattedTime = "-" + formattedTime;
     }
 
     return formattedTime.trim();
@@ -164,21 +188,54 @@ const Dashboard = () => {
       return obj;
     }, {});
 
-    // Convert the object to an array of arrays
-    const groupedEvents = Object.values(eventsByColor);
+    // Convert the object to an array of objects
+    const groupedEvents = Object.entries(eventsByColor).map(
+      ([name, events]) => ({ name, events })
+    );
 
     return groupedEvents;
   }
 
-  //i want to console log all the events in the calendarDataCurrent
-  console.log(calendarDataCurrent);
-  const groupedEvents = groupEventsByName(calendarDataCurrent);
-  console.log(groupedEvents);
+  function compareEventGroups(current, previous) {
+    //if the event groups have the same name then we can compare them
+    return current
+      .map((currentEventGroup) => {
+        const matchingPreviousEventGroup = previous.find(
+          (previousEventGroup) =>
+            currentEventGroup.name === previousEventGroup.name
+        );
+
+        if (matchingPreviousEventGroup) {
+          return {
+            name: currentEventGroup.name,
+            eventsDifference:
+              currentEventGroup.events.length -
+              matchingPreviousEventGroup.events.length,
+            timeDifference:
+              calculateTotalTime(currentEventGroup.events) -
+              calculateTotalTime(matchingPreviousEventGroup.events),
+          };
+        }
+      })
+      .filter(Boolean); // remove undefined values
+  }
+
+  const groupedEventsCurrent = groupEventsByName(calendarDataCurrent);
+  const groupedEventsPrevious = groupEventsByName(calendarDataPrevious);
+  const comparisonResult = compareEventGroups(
+    groupedEventsCurrent,
+    groupedEventsPrevious
+  );
+  //console.log(comparisonResult);
+
+  //i want to take as much of the logic out of the display as possible
+
   return (
     <div>
       <div>
-        <button onClick={() => fetchData("week")}>Fetch Week Data</button>
-        <button onClick={() => fetchData("month")}>Fetch Month Data</button>
+        <button onClick={() => fetchData("day")}>Day</button>
+        <button onClick={() => fetchData("week")}>Week</button>
+        <button onClick={() => fetchData("month")}>Month</button>
 
         <p>
           Current Start:{" "}
@@ -186,18 +243,49 @@ const Dashboard = () => {
           {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
         </p>
         <p>
-          Previous Start:{" "}
+          Debug purposes only: Previous Start:{" "}
           {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous
           End: {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
         </p>
         <div className="dashboard">
-          {groupedEvents.map((group) => (
-            <div className="event-card" key={group.name}>
-              <h3>{group.name}</h3>
-              <p>Total Events: {group.events.length}</p>
-              <p>Total Time: {formatTime(calculateTotalTime(group.events))}</p>
-            </div>
-          ))}
+          {groupedEventsCurrent.map((groupCurrent) => {
+            return (
+              <div className="event-card" key={groupCurrent.name}>
+                <h3>{groupCurrent.name}</h3>
+                <p>Total Events: {groupCurrent.events.length}</p>
+                <p>
+                  Total Time:{" "}
+                  {formatTime(calculateTotalTime(groupCurrent.events))}
+                </p>
+                {comparisonResult.map((result) => {
+                  if (result.name === groupCurrent.name) {
+                    return (
+                      <div>
+                        <p
+                          className={
+                            result.eventsDifference < 0
+                              ? "negative"
+                              : "positive"
+                          }
+                        >
+                          Events Difference: {result.eventsDifference}
+                        </p>
+                        <p
+                          className={
+                            formatTime(result.timeDifference).startsWith("-")
+                              ? "negative"
+                              : "positive"
+                          }
+                        >
+                          Time Difference: {formatTime(result.timeDifference)}
+                        </p>
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

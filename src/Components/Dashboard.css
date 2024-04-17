@@ -27,3 +27,15 @@
     align-items: center;
     margin: 10px;
 }
+
+.positive{
+    color: rgb(8, 184, 37);
+}
+
+.negative{
+    color: rgb(184, 8, 8);
+}
+
+p{
+    margin: 5px;
+}
