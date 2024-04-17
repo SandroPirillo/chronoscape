@@ -14,9 +14,6 @@ import "./EventList.css";
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 function colourIdConverter(id) {
-  /**
-
-   */
   switch (id) {
     case "1":
       return "rgba(121, 134, 203, 0.6)";
@@ -44,7 +41,8 @@ function colourIdConverter(id) {
       return "rgba(3, 155, 229, 0.6)";
   }
 }
-const EventList = ({ group, onBack }) => {
+
+const EventList = ({ group, onBack, dates }) => {
   const data = {
     labels: group.events.map((event) => event.name),
     datasets: [
@@ -62,6 +60,7 @@ const EventList = ({ group, onBack }) => {
   return (
     <div>
       <button onClick={onBack}>Back to groups</button>
+      <p>{dates[0]} - {dates[1]}</p>
       <div className="bar-chart">
         <Bar data={data} />
       </div>

@@ -12,7 +12,6 @@ const Dashboard = () => {
 
 
   const handleGroupClick = group => {
-    console.log("Group clicked", group);
     setSelectedGroup(group);
   };
 
@@ -71,7 +70,7 @@ const Dashboard = () => {
   );
 
   if (selectedGroup) {
-    return <EventList group={selectedGroup} onBack={() => setSelectedGroup(null)} />;
+    return <EventList group={selectedGroup} onBack={() => setSelectedGroup(null)} dates={[Datebounds[1].toLocaleDateString(), Datebounds[0].toLocaleDateString()]}/>;
   } else {
 
   return (
