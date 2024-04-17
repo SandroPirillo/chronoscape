@@ -45,7 +45,6 @@ function colourIdConverter(id) {
   }
 }
 const EventList = ({ group, onBack }) => {
-  console.log(group.events.map((event) => event.colour));
   const data = {
     labels: group.events.map((event) => event.name),
     datasets: [
