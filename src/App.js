@@ -1,5 +1,5 @@
 import React from "react";
-import useGoogleAuth from "./CalendarAccess.js";
+import useGoogleAuth from "./Utils/CalendarAccess.js";
 import "./App.css";
 import "./Components/Dashboard.js";
 import Dashboard from "./Components/Dashboard.js";
