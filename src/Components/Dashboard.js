@@ -1,11 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "./Dashboard.css";
 import Event from "../Models/Event";
+import EventList from "./EventList";
 
 const Dashboard = () => {
   const [calendarDataCurrent, setCalendarDataCurrent] = useState([]);
   const [calendarDataPrevious, setCalendarDataPrevious] = useState([]);
   const [Datebounds, setDatebounds] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+
+  const handleGroupClick = group => {
+    setSelectedGroup(group);
+  };
 
   async function makeRequest(startDate, endDate) {
     try {
@@ -226,9 +232,10 @@ const Dashboard = () => {
     groupedEventsCurrent,
     groupedEventsPrevious
   );
-  //console.log(comparisonResult);
 
-  //i want to take as much of the logic out of the display as possible
+  if (selectedGroup) {
+    return <EventList group={selectedGroup} onBack={() => setSelectedGroup(null)} />;
+  } else {
 
   return (
     <div>
@@ -243,14 +250,14 @@ const Dashboard = () => {
           {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
         </p>
         <p>
-          Debug purposes only: Previous Start:{" "}
+          Previous Start:{" "}
           {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous
           End: {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
         </p>
         <div className="dashboard">
           {groupedEventsCurrent.map((groupCurrent) => {
             return (
-              <div className="event-card" key={groupCurrent.name}>
+              <div className="event-card" key={groupCurrent.name} onClick={() => handleGroupClick(groupCurrent)}>
                 <h3>{groupCurrent.name}</h3>
                 <p>Total Events: {groupCurrent.events.length}</p>
                 <p>
@@ -290,15 +297,7 @@ const Dashboard = () => {
       </div>
     </div>
   );
+}
 };
 
 export default Dashboard;
-
-/*
-
-functions:
-fetch todays data
-fetch yesterdays data
-
-
-*/
