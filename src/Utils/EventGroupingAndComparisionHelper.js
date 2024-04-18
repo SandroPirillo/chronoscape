@@ -42,11 +42,11 @@ static convertDataToEventObjects = (CalendarEvents) => {
     return eventObjects;
   };
   
-  static dateSetter(timeSpan) {
-    var endDateCurrent = new Date();
-    var startDateCurrent = new Date();
-    var endDatePrevious = new Date(startDateCurrent.getTime());
-    var startDatePrevious = new Date(startDateCurrent.getTime());
+  static dateSetter(timeSpan, newDateBounds) {
+    var endDateCurrent = newDateBounds ? newDateBounds[0] : new Date();
+    var startDateCurrent = newDateBounds ? newDateBounds[1] : new Date();
+    var endDatePrevious = newDateBounds ? newDateBounds[2] : new Date(startDateCurrent.getTime());
+    var startDatePrevious = newDateBounds ? newDateBounds[3] : new Date(startDateCurrent.getTime());
   
     switch (timeSpan) {
       case "day":
