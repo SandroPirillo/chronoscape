@@ -3,8 +3,6 @@ import EventGroupingAndComparisionHelper from '../Utils/EventGroupingAndComparis
 import './EventGroupDisplayCard.css';
 
 const EventGroupDisplayCard = ({ groupCurrent,  comparisonResult}) => {
-    // Access properties of the eventGroup object here
-
     return (
         <div className="event-card" key={groupCurrent.name} >
           <h3>{groupCurrent.name}</h3>

@@ -29,8 +29,6 @@ function App() {
         </button>
       )}
       </div>
-      <p>A productivity tracker to help you manage your time and tasks.</p>
-
       {isLoggedIn ? (
         <div>
           <Dashboard />

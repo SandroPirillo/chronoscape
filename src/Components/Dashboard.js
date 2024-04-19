@@ -135,6 +135,7 @@ const Dashboard = () => {
             setDateRange={setDateRange}
             adjustDateBounds={adjustDateBounds}
             Datebounds={Datebounds}
+            DateRange={DateRange}
           />
           <div className="dashboard">
             {groupedEventsCurrent.map((groupCurrent) => {

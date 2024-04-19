@@ -1,49 +1,66 @@
-import React from 'react';
+import "./DashboardControls.css";
+import React, { useState } from "react";
+import "./DashboardControls.css";
 
-const DashboardControls = ({fetchData, setDateRange, adjustDateBounds, Datebounds}) => {
-    
+const DashboardControls = ({
+  fetchData,
+  setDateRange,
+  adjustDateBounds,
+  Datebounds,
+  DateRange
+}) => {
+  const [currentSelection, setCurrentSelection] = useState(DateRange);
 
-    return (
-        <div>
+return (
+    <div>
+        <div className="button-container">
             <button
-            onClick={() => {
-              fetchData("day");
-              setDateRange("day");
-            }}
-          >
-            Day
-          </button>
-          <button
-            onClick={() => {
-              fetchData("week");
-              setDateRange("week");
-            }}
-          >
-            Week
-          </button>
-          <button
-            onClick={() => {
-              fetchData("month");
-              setDateRange("month");
-            }}
-          >
-            Month
-          </button>
-          <button onClick={() => adjustDateBounds(-1)}>Previous</button>
-          <button onClick={() => adjustDateBounds(1)}>Next</button>
-
-          <p>
-            Current Start:{" "}
-            {Datebounds[1] ? Datebounds[1].toLocaleDateString() : ""} Current
-            End: {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
-          </p>
-          <p>
-            Previous Start:{" "}
-            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous
-            End: {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
-          </p>
+                className={currentSelection === "day" ? "current-selection" : ""}
+                onClick={() => {
+                    fetchData("day");
+                    setDateRange("day");
+                    setCurrentSelection("day");
+                }}
+            >
+                Day
+            </button>
+            <button
+                className={currentSelection === "week" ? "current-selection" : ""}
+                onClick={() => {
+                    fetchData("week");
+                    setDateRange("week");
+                    setCurrentSelection("week");
+                }}
+            >
+                Week
+            </button>
+            <button
+                className={currentSelection === "month" ? "current-selection" : ""}
+                onClick={() => {
+                    fetchData("month");
+                    setDateRange("month");
+                    setCurrentSelection("month");
+                }}
+            >
+                Month
+            </button>
         </div>
-    );
+        <div className="date-container">
+            <button className="date-shifter" onClick={() => adjustDateBounds(-1)}>&lt;</button>
+            <p>
+                Current Start:{" "}
+                {Datebounds[1] ? Datebounds[1].toLocaleDateString() : ""} Current End:{" "}
+                {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
+            </p>
+            <button className="date-shifter" onClick={() => adjustDateBounds(1)}>&gt;</button>
+        </div>
+        <p>
+            Previous Start:{" "}
+            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous End:{" "}
+            {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
+        </p>
+    </div>
+);
 };
 
 export default DashboardControls;

@@ -45,7 +45,7 @@ const averageTimeArray = Array(group.events.length).fill(averageTimeInHours);
   };
   return (
     <div>
-      <button onClick={onBack}>Back to groups</button>
+      <button className="button" onClick={onBack}>Back to groups</button>
       <p>{dates[0]} - {dates[1]}</p>
       <div className="bar-chart">
         <Bar data={data} />
