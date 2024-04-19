@@ -48,15 +48,15 @@ return (
         <div className="date-container">
             <button className="date-shifter" onClick={() => adjustDateBounds(-1)}>&lt;</button>
             <p>
-                Current Start:{" "}
-                {Datebounds[1] ? Datebounds[1].toLocaleDateString() : ""} Current End:{" "}
+                
+                {Datebounds[1] ? Datebounds[1].toLocaleDateString() : ""} - 
                 {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
             </p>
             <button className="date-shifter" onClick={() => adjustDateBounds(1)}>&gt;</button>
         </div>
         <p>
-            Previous Start:{" "}
-            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous End:{" "}
+            {"Last " + currentSelection+": "}
+            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""}
             {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
         </p>
     </div>

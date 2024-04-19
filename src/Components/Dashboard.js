@@ -106,6 +106,14 @@ const Dashboard = () => {
     await fetchData(DateRange, newDateBounds);
   };
 
+  const groupsTotalTime = (groups) => {
+    let total = 0;
+    groups.map((group) => {
+      total += EventGroupingAndComparisionHelper.calculateTotalTime(group.events);
+    });
+    return total;
+  };
+
   const groupedEventsCurrent =
     EventGroupingAndComparisionHelper.groupEventsByName(calendarDataCurrent);
   const groupedEventsPrevious =
@@ -150,6 +158,7 @@ const Dashboard = () => {
               );
             })}
           </div>
+          <p>Total Time Spent this {DateRange}: {EventGroupingAndComparisionHelper.formatTime(groupsTotalTime(groupedEventsCurrent))}</p>
           <EventGroupChartDisplay
             groups={[groupedEventsCurrent, groupedEventsPrevious]}
           />
