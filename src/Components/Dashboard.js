@@ -4,6 +4,7 @@ import EventGroupingAndComparisionHelper from "../Utils/EventGroupingAndComparis
 import EventList from "./EventList";
 import EventGroupDisplayCard from "./EventGroupDisplayCard";
 import EventGroupChartDisplay from "./EventGroupChartDisplay.js";
+import DashboardControls from "./DashboardControls.js";
 
 const Dashboard = () => {
   const [calendarDataCurrent, setCalendarDataCurrent] = useState([]);
@@ -129,43 +130,12 @@ const Dashboard = () => {
     return (
       <div>
         <div>
-          <button
-            onClick={() => {
-              fetchData("day");
-              setDateRange("day");
-            }}
-          >
-            Day
-          </button>
-          <button
-            onClick={() => {
-              fetchData("week");
-              setDateRange("week");
-            }}
-          >
-            Week
-          </button>
-          <button
-            onClick={() => {
-              fetchData("month");
-              setDateRange("month");
-            }}
-          >
-            Month
-          </button>
-          <button onClick={() => adjustDateBounds(-1)}>Previous</button>
-          <button onClick={() => adjustDateBounds(1)}>Next</button>
-
-          <p>
-            Current Start:{" "}
-            {Datebounds[1] ? Datebounds[1].toLocaleDateString() : ""} Current
-            End: {Datebounds[0] ? Datebounds[0].toLocaleDateString() : ""}
-          </p>
-          <p>
-            Previous Start:{" "}
-            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous
-            End: {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
-          </p>
+        <DashboardControls
+            fetchData={fetchData}
+            setDateRange={setDateRange}
+            adjustDateBounds={adjustDateBounds}
+            Datebounds={Datebounds}
+          />
           <div className="dashboard">
             {groupedEventsCurrent.map((groupCurrent) => {
               return (

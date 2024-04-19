@@ -15,7 +15,6 @@ Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const colourCoverter = EventGroupingAndComparisionHelper.colourIdConverter;
 
-//what i want is to display a bar chart of the total time for each group in current and if there is a previous group with the same name i want to 
 //display the total time for that group as well as a comparison between the two groups
 const EventGroupChartDisplay = ({ groups, dates }) => {
     const secondGroupMap = new Map(groups[1].map((group) => [group.name, group]));

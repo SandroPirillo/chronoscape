@@ -15,21 +15,24 @@ function App() {
 
   return (
     <div className="App">
+      <div className="header">
       <h1>ChronoScape productivity tracker</h1>
-      <p>A productivity tracker to help you manage your time and tasks.</p>
       {isLoggedIn ? (
+        <div className="content-block"> <p className="centered">{userProfile.getName()} </p>
         <button className="login-button" onClick={handleLogout}>
           Logout
         </button>
+        </div>
       ) : (
         <button className="login-button" onClick={handleLogin}>
           Login
         </button>
       )}
+      </div>
+      <p>A productivity tracker to help you manage your time and tasks.</p>
 
       {isLoggedIn ? (
         <div>
-          <h2>Welcome {userProfile.getName()}</h2>
           <Dashboard />
         </div>
       ) : (
