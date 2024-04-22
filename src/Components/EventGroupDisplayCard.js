@@ -22,16 +22,16 @@ const EventGroupDisplayCard = ({ groupCurrent,  comparisonResult}) => {
                         : "positive"
                     }
                   >
-                    Events Difference: {result.eventsDifference}
+                    Events Difference: {result.eventsDifference} {result.eventsDifference < 0 ? '↓' : '↑'}
                   </p>
                   <p
                     className={
                       EventGroupingAndComparisionHelper.formatTime(result.timeDifference).startsWith("-")
                         ? "negative"
                         : "positive"
-                    }
+                    } 
                   >
-                    Time Difference: {EventGroupingAndComparisionHelper.formatTime(result.timeDifference)}
+                    Time Difference: {EventGroupingAndComparisionHelper.formatTime(result.timeDifference)} {EventGroupingAndComparisionHelper.formatTime(result.timeDifference).startsWith("-") ? '↓' : '↑'}
                   </p>
                 </div>
               );

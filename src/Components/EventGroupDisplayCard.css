@@ -30,3 +30,11 @@ p{
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
+
+.event-card-element{
+    background-color: #707070;
+    border-radius: 10px;
+    padding-left: 10%;
+    padding-right: 10%;
+    
+}
