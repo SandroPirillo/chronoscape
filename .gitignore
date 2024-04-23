@@ -21,7 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.env
 Data/calendarDataCurrentday.csv
 Data/calendarDataCurrentmonth.csv
 Data/calendarDataCurrentweek.csv
