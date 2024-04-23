@@ -55,8 +55,8 @@ return (
             <button className="date-shifter" onClick={() => adjustDateBounds(1)}>&gt;</button>
         </div>
         <p>
-            Previous Start:{" "}
-            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""} Previous End:{" "}
+            {"Last " + currentSelection+": "}
+            {Datebounds[3] ? Datebounds[3].toLocaleDateString() : ""}
             {Datebounds[2] ? Datebounds[2].toLocaleDateString() : ""}
         </p>
     </div>

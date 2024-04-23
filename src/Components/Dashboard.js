@@ -37,7 +37,7 @@ const Dashboard = () => {
       console.error("Error fetching calendar data:", error);
     }
   }
-
+  //if there are more than 250 events in the request, the api will return the first 250 events
   const fetchData = useCallback(async (DateRange, newDateBounds) => {
     var dates = newDateBounds
       ? EventGroupingAndComparisionHelper.dateSetter(DateRange, newDateBounds)
@@ -106,6 +106,18 @@ const Dashboard = () => {
     await fetchData(DateRange, newDateBounds);
   };
 
+  const groupsTotalTime = (groups) => {
+    let total = 0;
+    groups.map((group) => {
+      total += EventGroupingAndComparisionHelper.calculateTotalTime(
+        group.events
+      );
+    });
+    return total;
+  };
+
+
+
   const groupedEventsCurrent =
     EventGroupingAndComparisionHelper.groupEventsByName(calendarDataCurrent);
   const groupedEventsPrevious =
@@ -130,7 +142,7 @@ const Dashboard = () => {
     return (
       <div>
         <div>
-        <DashboardControls
+          <DashboardControls
             fetchData={fetchData}
             setDateRange={setDateRange}
             adjustDateBounds={adjustDateBounds}
@@ -150,6 +162,12 @@ const Dashboard = () => {
               );
             })}
           </div>
+          <p>
+            Total Time Spent this {DateRange}:{" "}
+            {EventGroupingAndComparisionHelper.formatTime(
+              groupsTotalTime(groupedEventsCurrent)
+            )}
+          </p>
           <EventGroupChartDisplay
             groups={[groupedEventsCurrent, groupedEventsPrevious]}
           />
