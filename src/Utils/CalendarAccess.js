@@ -60,6 +60,9 @@ const useGoogleAuth = () => {
         setUserProfile(currentUser.getBasicProfile());
       });
     }
+    else {
+      console.error("Google API not loaded");
+    }
   };
 
   const handleLogout = () => {
