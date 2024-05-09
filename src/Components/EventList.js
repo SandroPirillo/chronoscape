@@ -20,7 +20,6 @@ Chart.register(BarElement, CategoryScale, LinearScale, PointElement, LineElement
 const EventList = ({ group, onBack, dates }) => {
   const totalSum = group.events.reduce((sum, event) => sum + event.totalTime, 0);
 const averageTimeInHours = totalSum / group.events.length / 3600000; // convert milliseconds to hours
-const averageTimeArray = Array(group.events.length).fill(averageTimeInHours);
   const data = {
     labels: group.events.map((event) => event.name),
     datasets: [
@@ -32,15 +31,7 @@ const averageTimeArray = Array(group.events.length).fill(averageTimeInHours);
         borderWidth: 1,
         hoverBackgroundColor: group.events.map((event) => EventGroupingAndComparisionHelper.colourIdConverter(event.colour)),
         hoverBorderColor: group.events.map((event) => EventGroupingAndComparisionHelper.colourIdConverter(event.colour)),
-      },
-      {
-        label: "Average Time in Hours",
-        data: averageTimeArray,
-        type: "line",
-        borderColor: "red",
-        borderWidth: 1,
-        fill: false,
-      },
+      }
     ],
   };
   return (
